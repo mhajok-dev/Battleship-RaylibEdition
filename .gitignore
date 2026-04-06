@@ -1,0 +1,20 @@
+# Build output
+x64/
+Debug/
+Release/
+*.obj
+*.tlog
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.exp
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# Dependencies (raylib wird nicht mit hochgeladen)
+Dependencies/
