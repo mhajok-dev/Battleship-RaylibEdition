@@ -1,8 +1,8 @@
 ﻿#include "AIPlayer.h"
 
-AIPlayer::AIPlayer(int boardSize)
-    : Player("AI", boardSize)
-{}
+AIPlayer::AIPlayer(int boardSize) : Player("AI", boardSize)
+{
+}
 
 Coordinate AIPlayer::GetHuntModeMove() const
 {
@@ -41,28 +41,18 @@ void AIPlayer::ClearTargetCells()
     m_targetCells.clear();
 }
 
-std::string AIPlayer::CoordinateToString(const Coordinate& coord) const
-{
-    return std::to_string(coord.column + 1) + static_cast<char>('A' + coord.row);
-}
-
-std::string AIPlayer::MakeMove()
+Coordinate AIPlayer::MakeMove()
 {
     Coordinate coord;
 
     if (!m_targetCells.empty())
     {
-        // Target mode: work through adjacent cells of a previous hit
         coord = m_targetCells.front();
         m_targetCells.erase(m_targetCells.begin());
     }
     else
-    {
-        // Hunt mode: shoot randomly
         coord = GetHuntModeMove();
-    }
 
     UpdateMoveHistory(coord.row, coord.column);
-
-    return CoordinateToString(coord);
+    return coord;
 }

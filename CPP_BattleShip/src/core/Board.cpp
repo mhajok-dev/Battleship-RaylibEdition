@@ -5,6 +5,11 @@ Board::Board(int boardSize)
     InitializeBoard(boardSize);
 }
 
+bool Board::WasAlreadyShot(int row, int col) const
+{
+    return m_hiddenBoard[row][col] == 'X' || m_hiddenBoard[row][col] == 'O';
+}
+
 void Board::InitializeBoard(int size)
 {
     m_boardSize = size;

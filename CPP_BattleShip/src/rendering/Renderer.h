@@ -14,30 +14,29 @@
 class Renderer
 {
 public:
-    // ── Constructor / Destructor ──────────────────────────────────────────
+    // ── Constructor / Destructor ────────────────────
     Renderer(int screenWidth, int screenHeight);
     ~Renderer() = default;
 
-    // ── Methods ───────────────────────────────────────────────────────────
+    // ── Methods ────────────────────
     void DrawBackground() const;
     void DrawBoardTitle(const std::string& title, int originX, int originY, int boardSize) const;
-    void DrawBoard(const Board& board, int originX, int originY, bool hideShips, bool interactive,
-        int lastShotRow = -1, int lastShotCol = -1) const;
-    void DrawPlayerBoard(const Board& board, int originX, int originY,
-                     int lastShotRow = -1, int lastShotCol = -1) const;
+    void DrawBoard(const Board& board, int originX, int originY, bool hideShips, bool interactive,int lastShotRow = -1,
+        int lastShotCol = -1) const;
+    void DrawPlayerBoard(const Board& board, int originX, int originY, int lastShotRow = -1, int lastShotCol = -1) const;
     void DrawShipCount(const Board& board, int originX, int originY) const;
     void DrawShipOutlines(const Board& board, int originX, int originY, bool sunkOnly = false) const;
     void DrawSeparator() const;
     void DrawLabels(int originX, int originY, int boardSize) const;
     void DrawStatusText(const std::string& text, Color color) const;
     void DrawStats(int playerHits, int playerShots, int aiHits, int aiShots) const;
-    void DrawMenuScreen(int boardSize, float timer) const;
+    void DrawMenuScreen(int boardSize, float timer, const std::vector<int>& shipLengths) const;
     void DrawGameOverScreen(bool playerWon, int playerHits, int playerShots, int aiHits, int aiShots, float timer) const;
     
     void TriggerShake(float intensity = 8.0f, float duration = 0.3f);
     void UpdateShake(float deltaTime);
 
-    // ── Getters ───────────────────────────────────────────────────────────
+    // ── Getters ────────────────────
     [[nodiscard]] int GetCellSize()   const { return m_cellSize;   }
     [[nodiscard]] int GetScreenWidth()  const { return m_screenWidth;  }
     [[nodiscard]] int GetScreenHeight() const { return m_screenHeight; }
@@ -50,10 +49,10 @@ public:
                                     int& outRow, int& outCol) const;
 
 private:
-    // ── Methods ───────────────────────────────────────────────────────────
+    // ── Methods ────────────────────
     void DrawCell(int x, int y, char gameCell, char hiddenCell, bool isHovered, bool isLastShot) const;
 
-    // ── Member Variables ──────────────────────────────────────────────────
+    // ── Member Variables ────────────────────
     int m_screenWidth  = 0;
     int m_screenHeight = 0;
     int m_cellSize     = 40;

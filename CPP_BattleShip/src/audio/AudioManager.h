@@ -1,5 +1,5 @@
 ﻿/*****************************************************************************
-+ Project: Battleship - Raylib Edition                                      +
+ + Project: Battleship - Raylib Edition                                      +
  + File: AudioManager.h                                                      +
  +                                                                           +
  + Manages all game audio — music and sound effects.                         +
@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #pragma once
+
 #include "raylib.h"
 
 class AudioManager

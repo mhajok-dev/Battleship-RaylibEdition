@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #pragma once
+
 #include <memory>
 #include <random>
 #include <vector>
@@ -29,16 +30,16 @@ enum class GameState : uint8_t
 class Game
 {
 public:
-    // ── Constructor / Destructor ─────
+    // ── Constructor / Destructor ────────────────────
     Game(int screenWidth, int screenHeight);
     ~Game() = default;
 
-    // ── Methods ─────
+    // ── Public methods ────────────────────
     void Update(float deltaTime);
     void Draw() const;
 
 private:
-    // ── Methods ─────
+    // ── Methods ────────────────────
     void StartNewGame();
     void PlaceShipsRandomly(Board& board) const;
     void ProcessMenuInput();
@@ -47,18 +48,22 @@ private:
     void SwitchToPlayerTurn();
     void SwitchToAITurn();
     void CheckWinCondition();
-    [[nodiscard]] std::vector<int> GetShipLengths() const;
+    
+    [[nodiscard]] std::vector<int> BuildFleetConfiguration() const;
     [[nodiscard]] bool CanPlaceShip(const Board& board, const Ship& ship) const;
     [[nodiscard]] ShotResult ApplyShot(Board& board, int row, int col);
 
-    // ── Member Variables ─────
+    // ── Member Variables ────────────────────
     Renderer m_renderer;
+    AudioManager m_audioManager;
+    
     std::unique_ptr<HumanPlayer> m_pHumanPlayer = nullptr;
     std::unique_ptr<AIPlayer> m_pAIPlayer = nullptr;
-    mutable std::mt19937 m_rng = std::mt19937(std::random_device{}());
+    
+    mutable std::mt19937 m_rng = std::mt19937(std::random_device{}()); // for random ships placing
+    
     std::string m_lastStatusMessage;
     Coordinate m_lastAIShot = { -1, -1 };
-    AudioManager m_audioManager;
 
     GameState m_state = GameState::MENU;
 

@@ -1,9 +1,9 @@
 ﻿/*****************************************************************************
-+ Project: Battleship - Raylib Edition                                      +
+ + Project: Battleship - Raylib Edition                                      +
  + File: Settings.h                                                          +
  +                                                                           +
  + Central place for all compile-time game constants.                        +
- + No logic, no dependencies — pure configuration values.                   +
+ + No logic, no dependencies — pure configuration values.                    +
  *****************************************************************************/
 
 #pragma once

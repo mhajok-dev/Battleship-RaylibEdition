@@ -1,5 +1,5 @@
 ﻿/*****************************************************************************
-+ Project: Battleship - Raylib Edition                                      +
+ + Project: Battleship - Raylib Edition                                      +
  + File: Ship.h                                                              +
  +                                                                           +
  + Represents a single ship on the board.                                    +
@@ -10,14 +10,14 @@
 
 struct Ship
 {
-    // ── Member Variables ─────
+    // ── Member Variables ────────────────────
     int m_startRow   = 0;
     int m_startCol   = 0;
     int m_length     = 0;
     int m_hits       = 0;
     bool m_bHorizontal = true;
 
-    // ── Methods ─────
+    // ── Methods ────────────────────
     [[nodiscard]] bool IsSunk() const { return m_hits >= m_length; }
 
     // Returns true if this ship occupies the given cell

@@ -3,9 +3,10 @@
 #include "Renderer.h"
 #include "../Colors.h"
 
-Renderer::Renderer(const int screenWidth, const int screenHeight)
-    : m_screenWidth(screenWidth), m_screenHeight(screenHeight)
-{}
+Renderer::Renderer(const int screenWidth, const int screenHeight) : m_screenWidth(screenWidth), 
+    m_screenHeight(screenHeight)
+{
+}
 
 void Renderer::DrawBackground() const
 {
@@ -124,7 +125,7 @@ void Renderer::DrawBoard(const Board& board, const int originX, const int origin
 }
 
 void Renderer::DrawPlayerBoard(const Board& board, const int originX, const int originY,
-                                const int lastShotRow, const int lastShotCol) const
+    const int lastShotRow, const int lastShotCol) const
 {
     const int boardSize = board.GetBoardSize();
     const auto& gameBoard = board.GetGameBoard();
@@ -150,8 +151,7 @@ void Renderer::DrawBoardTitle(const std::string& title, const int originX, const
     constexpr int fontSize = 18;
     const int textWidth = MeasureText(title.c_str(), fontSize);
     const int boardWidth = boardSize * m_cellSize;
-    DrawText(title.c_str(), originX + (boardWidth - textWidth) / 2, originY - 45, fontSize,
-        GameColors::TEXT_ACCENT);
+    DrawText(title.c_str(), originX + (boardWidth - textWidth) / 2, originY - 45, fontSize, GameColors::TEXT_ACCENT);
 }
 
 void Renderer::DrawShipCount(const Board& board, const int originX, const int originY) const
@@ -159,40 +159,27 @@ void Renderer::DrawShipCount(const Board& board, const int originX, const int or
     constexpr int fontSize = 16;
     const int boardHeight = board.GetBoardSize() * m_cellSize;
     const std::string text = "Ships remaining: " + std::to_string(board.GetRemainingShips());
-    DrawText(text.c_str(),
-             originX,
-             originY + boardHeight + 10,
-             fontSize,
-             GameColors::TEXT_NORMAL);
+    DrawText(text.c_str(), originX, originY + boardHeight + 10, fontSize, GameColors::TEXT_NORMAL);
 }
 
 void Renderer::DrawShipOutlines(const Board& board, int originX, int originY, bool sunkOnly) const
 {
-    constexpr auto outlineColor = RED;
+    constexpr auto outlineColor = GameColors::CELL_OUTLINE;
 
     for (const Ship& ship : board.GetShips())
     {
-        if (sunkOnly && !ship.IsSunk())  // <── neu
+        if (sunkOnly && !ship.IsSunk())
             continue;
         
         constexpr int thickness = 2;
         const int startX = originX + ship.m_startCol * m_cellSize;
         const int startY = originY + ship.m_startRow * m_cellSize;
 
-        const int width  = ship.m_bHorizontal
-            ? ship.m_length * m_cellSize - 1
-            : m_cellSize - 1;
+        const int width  = ship.m_bHorizontal ? ship.m_length * m_cellSize - 1 : m_cellSize - 1;
+        const int height = ship.m_bHorizontal ? m_cellSize - 1 : ship.m_length * m_cellSize - 1;
 
-        const int height = ship.m_bHorizontal
-            ? m_cellSize - 1
-            : ship.m_length * m_cellSize - 1;
-
-        DrawRectangleLinesEx(
-            { static_cast<float>(startX), static_cast<float>(startY),
-              static_cast<float>(width),  static_cast<float>(height) },
-            thickness,
-            outlineColor
-        );
+        DrawRectangleLinesEx({ static_cast<float>(startX), static_cast<float>(startY),
+              static_cast<float>(width),  static_cast<float>(height) }, thickness, outlineColor);
     }
 }
 
@@ -205,7 +192,7 @@ void Renderer::DrawSeparator() const
 }
 
 bool Renderer::ScreenToBoard(const int mouseX, const int mouseY, const int originX, const int originY,
-                            const int boardSize, int& outRow, int& outCol) const
+    const int boardSize, int& outRow, int& outCol) const
 {
     const int relX = mouseX - originX;
     const int relY = mouseY - originY;
@@ -248,16 +235,15 @@ void Renderer::DrawStats(const int playerHits, const int playerShots, const int 
              padding, m_screenHeight - 30, fontSize, GameColors::TEXT_SUCCESS);
 
     // AI stats — right side
-    const std::string aiText = TextFormat("AI  Hits: %d | Shots: %d | Hitrate: %.1f%%",
-                                          aiHits, aiShots, aiHitRate);
+    const std::string aiText = TextFormat("AI  Hits: %d | Shots: %d | Hitrate: %.1f%%", aiHits, aiShots, aiHitRate);
     const int aiTextWidth = MeasureText(aiText.c_str(), fontSize);
-    DrawText(aiText.c_str(), m_screenWidth - aiTextWidth - padding, m_screenHeight - 30,
-             fontSize, GameColors::TEXT_ERROR);
+    DrawText(aiText.c_str(), m_screenWidth - aiTextWidth - padding, m_screenHeight - 30, fontSize, 
+        GameColors::TEXT_ERROR);
 }
 
-void Renderer::DrawMenuScreen(const int boardSize, const float timer) const
+void Renderer::DrawMenuScreen(int boardSize, float timer, const std::vector<int>& shipLengths) const
 {
-    // ── Animated Waves ────────────────────────────────────────────────────
+    // ── Animated Waves ────────────────────
     for (int x = 0; x < m_screenWidth; x += 4)
     {
         const float wave1 = std::sin(x * 0.02f + timer * 1.5f) * 15.0f;
@@ -266,76 +252,53 @@ void Renderer::DrawMenuScreen(const int boardSize, const float timer) const
         const int y1 = static_cast<int>(m_screenHeight * 0.42f + wave1);
         const int y2 = static_cast<int>(m_screenHeight * 0.45f + wave2);
 
-        DrawRectangle(x, y1, 4, 3, { 20, 60, 120, 120 });
-        DrawRectangle(x, y2, 4, 3, { 30, 80, 160, 80  });
+        DrawRectangle(x, y1, 4, 3, GameColors::WAVE_MENU_1);
+        DrawRectangle(x, y2, 4, 3, GameColors::WAVE_MENU_2);
     }
 
-    // ── Title ─────────────────────────────────────────────────────────────
+    // ── Title ────────────────────
     const float pulse = (std::sin(timer * 2.0f) + 1.0f) / 2.0f;
     const unsigned char titleAlpha = static_cast<unsigned char>(180 + pulse * 75.0f);
 
     constexpr int titleFontSize = 50;
     const char* title = "BATTLESHIP - RAYLIB EDITION";
     const int titleWidth = MeasureText(title, titleFontSize);
-    DrawText(title,
-             (m_screenWidth - titleWidth) / 2,
-             static_cast<int>(m_screenHeight * 0.12f),
-             titleFontSize,
+    DrawText(title, (m_screenWidth - titleWidth) / 2, static_cast<int>(m_screenHeight * 0.12f), titleFontSize,
              { GameColors::TEXT_ACCENT.r,
                GameColors::TEXT_ACCENT.g,
                GameColors::TEXT_ACCENT.b,
                titleAlpha });
 
-    // ── Subtitle ──────────────────────────────────────────────────────────
+    // ── Subtitle ────────────────────
     constexpr int subtitleFontSize = 18;
-    const char* subtitle = "Sink all enemy ships before the AI sinks yours!";
+    const auto subtitle = "Sink all enemy ships before the AI sinks yours!";
     const int subtitleWidth = MeasureText(subtitle, subtitleFontSize);
-    DrawText(subtitle,
-             (m_screenWidth - subtitleWidth) / 2,
-             static_cast<int>(m_screenHeight * 0.22f),
-             subtitleFontSize,
-             GameColors::TEXT_DIM);
+    DrawText(subtitle, (m_screenWidth - subtitleWidth) / 2, static_cast<int>(m_screenHeight * 0.22f),
+        subtitleFontSize, GameColors::TEXT_DIM);
     
-    // ── Board Size Selector ───────────────────────────────────────────────
+    // ── Board Size Selector ────────────────────
     const int leftBlockX = m_screenWidth / 4;
     const int blockY = static_cast<int>(m_screenHeight * 0.52f);
 
     constexpr int labelFontSize = 18;
     constexpr int sizeFontSize  = 42;
 
-    const char* sizeLabel = "BOARD SIZE";
+    const auto sizeLabel = "BOARD SIZE";
     const int sizeLabelWidth = MeasureText(sizeLabel, labelFontSize);
-    DrawText(sizeLabel,
-             leftBlockX - sizeLabelWidth / 2,
-             blockY - 30,
-             labelFontSize,
-             GameColors::TEXT_DIM);
+    DrawText(sizeLabel, leftBlockX - sizeLabelWidth / 2, blockY - 30, labelFontSize, GameColors::TEXT_DIM);
 
-    // < Arrow
-    const char* arrowLeft = "<";
-    DrawText(arrowLeft,
-             leftBlockX - 80,
-             blockY + 5,
-             sizeFontSize,
-             GameColors::TEXT_WARNING);
+    // ── < Arrow ────────────────────
+    DrawText("<", leftBlockX - 80, blockY + 5, sizeFontSize, GameColors::TEXT_WARNING);
 
-    // Board size number
+    // ── Board size number ────────────────────
     const std::string sizeStr = std::to_string(boardSize) + "x" + std::to_string(boardSize);
     const int sizeStrWidth = MeasureText(sizeStr.c_str(), sizeFontSize);
-    DrawText(sizeStr.c_str(),
-             leftBlockX - sizeStrWidth / 2,
-             blockY,
-             sizeFontSize,
-             GameColors::TEXT_NORMAL);
+    DrawText(sizeStr.c_str(), leftBlockX - sizeStrWidth / 2, blockY, sizeFontSize, GameColors::TEXT_NORMAL);
 
-    // > Arrow
-    DrawText(">",
-             leftBlockX + 60,
-             blockY + 5,
-             sizeFontSize,
-             GameColors::TEXT_WARNING);
+    // ── > Arrow ────────────────────
+    DrawText(">", leftBlockX + 60, blockY + 5, sizeFontSize, GameColors::TEXT_WARNING);
 
-    // ── Preview Grid ──────────────────────────────────────────────────────
+    // ── Preview Grid ────────────────────
     const int previewX = static_cast<int>(m_screenWidth * 0.62f);
     const int previewY = static_cast<int>(m_screenHeight * 0.30f);
 
@@ -343,51 +306,36 @@ void Renderer::DrawMenuScreen(const int boardSize, const float timer) const
     const int cellSize = maxPreviewSize / boardSize;
     const int actualSize = cellSize * boardSize;
 
-    const char* previewLabel = "PREVIEW";
+    const auto previewLabel = "PREVIEW";
     const int previewLabelWidth = MeasureText(previewLabel, labelFontSize);
-    DrawText(previewLabel,
-             previewX + actualSize / 2 - previewLabelWidth / 2,
-             previewY - 30,
-             labelFontSize,
-             GameColors::TEXT_DIM);
+    DrawText(previewLabel, previewX + actualSize / 2 - previewLabelWidth / 2, previewY - 30, labelFontSize,
+        GameColors::TEXT_DIM);
 
     for (int row = 0; row < boardSize; row++)
     {
         for (int col = 0; col < boardSize; col++)
         {
             // Alternating cell colors for better visibility
-            const Color cellColor = (row + col) % 2 == 0
-                ? Color{ 35, 45, 90, 255 }
-            : Color{ 25, 32, 68, 255 };
+            const Color cellColor = (row + col) % 2 == 0 ? Color{ 35, 45, 90, 255 }
+                : Color{ 25, 32, 68, 255 };
 
-            DrawRectangle(
-                previewX + col * cellSize,
-                previewY + row * cellSize,
-                cellSize - 1,
-                cellSize - 1,
-                cellColor
-            );
+            DrawRectangle(previewX + col * cellSize, previewY + row * cellSize, cellSize - 1, cellSize - 1,
+                cellColor);
         }
     }
     
-    // ── Fleet Overview ────────────────────────────────────────────────────
+    // ── Fleet Overview ────────────────────
     const int fleetX = leftBlockX - 100;
     const int fleetY = blockY + 80;
     constexpr int fleetFontSize = 16;
     constexpr int fleetLineHeight = 28;
 
-    const char* fleetLabel = "YOUR FLEET:";
+    const auto fleetLabel = "YOUR FLEET:";
     DrawText(fleetLabel, fleetX, fleetY, fleetFontSize, GameColors::TEXT_DIM);
 
     // Build ship lengths for current board size
     std::vector<std::pair<int, int>> shipGroups;
-    std::vector<int> lengths;
-
-    if (boardSize <= 6)  lengths = { 3, 2, 2 };
-    else if (boardSize <= 8)  lengths = { 4, 3, 3, 2, 2 };
-    else if (boardSize <= 10) lengths = { 5, 4, 4, 3, 3, 3, 2, 2, 2, 2 };
-    else if (boardSize <= 13) lengths = { 5, 5, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2 };
-    else                      lengths = { 6, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2 };
+    const std::vector<int>& lengths = shipLengths;
 
     // Group by length: count how many of each
     for (const int len : lengths)
@@ -397,7 +345,7 @@ void Renderer::DrawMenuScreen(const int boardSize, const float timer) const
         {
             if (pair.first == len) { pair.second++; found = true; break; }
         }
-        if (!found) shipGroups.push_back({ len, 1 });
+        if (!found) shipGroups.emplace_back(len, 1);
     }
 
     // Draw each group
@@ -408,8 +356,7 @@ void Renderer::DrawMenuScreen(const int boardSize, const float timer) const
         const int lineY  = fleetY + fleetLineHeight * (i + 1);
 
         // Count label
-        DrawText(TextFormat("%dx", count),
-                 fleetX, lineY, fleetFontSize, GameColors::TEXT_NORMAL);
+        DrawText(TextFormat("%dx", count), fleetX, lineY, fleetFontSize, GameColors::TEXT_NORMAL);
 
         // Ship block visualization
         constexpr int blockW = 18;
@@ -419,55 +366,44 @@ void Renderer::DrawMenuScreen(const int boardSize, const float timer) const
 
         for (int b = 0; b < length; b++)
         {
-            DrawRectangle(
-                blocksStartX + b * (blockW + blockSpacing),
-                lineY,
-                blockW, blockH,
-                GameColors::CELL_SHIP
-            );
+            DrawRectangle(blocksStartX + b * (blockW + blockSpacing), lineY, blockW, blockH, 
+                GameColors::CELL_SHIP);
         }
 
-        // L-label
-        DrawText(TextFormat("L%d", length),
-                 blocksStartX + length * (blockW + blockSpacing) + 8,
-                 lineY, fleetFontSize, GameColors::TEXT_DIM);
+        // ── L-label ────────────────────
+        DrawText(TextFormat("L%d", length), blocksStartX + length * (blockW + blockSpacing) + 8,lineY, 
+            fleetFontSize, GameColors::TEXT_DIM);
     }
 
-    // ── Enter Button ──────────────────────────────────────────────────────
+    // ── Enter Button ────────────────────
     const float enterPulse = (std::sin(timer * 5.0f) + 1.0f) / 2.0f;
     const unsigned char enterAlpha = static_cast<unsigned char>(150 + enterPulse * 105.0f);
 
     constexpr int enterFontSize = 25;
     const auto enterText = "[ PRESS ENTER TO START ]";
     const int enterWidth = MeasureText(enterText, enterFontSize);
-    DrawText(enterText,
-             (m_screenWidth - enterWidth) / 2,
-             static_cast<int>(m_screenHeight * 0.88f),
-             enterFontSize,
-             { GameColors::TEXT_SUCCESS.r,
-               GameColors::TEXT_SUCCESS.g,
-               GameColors::TEXT_SUCCESS.b,
-               enterAlpha });
+    DrawText(enterText, (m_screenWidth - enterWidth) / 2, static_cast<int>(m_screenHeight * 0.88f),
+        enterFontSize,
+        { GameColors::TEXT_SUCCESS.r,
+          GameColors::TEXT_SUCCESS.g,
+          GameColors::TEXT_SUCCESS.b,
+          enterAlpha });
 }
 
-void Renderer::DrawGameOverScreen(const bool playerWon, const int playerHits,
-                                   const int playerShots, const int aiHits,
-                                   const int aiShots, const float timer) const
+void Renderer::DrawGameOverScreen(const bool playerWon, const int playerHits, const int playerShots, const int aiHits,
+    const int aiShots, const float timer) const
 {
-    // ── Background Effect ─────────────────────────────────────────────────
+    // ── Background Effect ────────────────────
     for (int x = 0; x < m_screenWidth; x += 4)
     {
         const float wave = std::sin(x * 0.02f + timer * 2.0f) * 12.0f;
         const int y = static_cast<int>(m_screenHeight * 0.55f + wave);
 
-        const Color waveColor = playerWon
-            ? Color{ 20, 80,  40,  100 }
-            : Color{ 80, 20,  20,  100 };
-
+        const Color waveColor = playerWon ? GameColors::WAVE_WIN : GameColors::WAVE_LOSE;
         DrawRectangle(x, y, 4, 3, waveColor);
     }
 
-    // ── Result Title ──────────────────────────────────────────────────────
+    // ── Result Title ────────────────────
     const float pulse = (std::sin(timer * 2.5f) + 1.0f) / 2.0f;
     const unsigned char titleAlpha = static_cast<unsigned char>(180 + pulse * 75.0f);
 
@@ -477,32 +413,23 @@ void Renderer::DrawGameOverScreen(const bool playerWon, const int playerHits,
     const Color titleColor = { baseColor.r, baseColor.g, baseColor.b, titleAlpha };
 
     const int titleWidth = MeasureText(resultText, titleFontSize);
-    DrawText(resultText,
-             (m_screenWidth - titleWidth) / 2,
-             static_cast<int>(m_screenHeight * 0.12f),
-             titleFontSize,
-             titleColor);
+    DrawText(resultText, (m_screenWidth - titleWidth) / 2, static_cast<int>(m_screenHeight * 0.12f),
+        titleFontSize, titleColor);
 
-    // ── Subtitle ──────────────────────────────────────────────────────────
+    // ── Subtitle ────────────────────
     constexpr int subtitleFontSize = 18;
-    const char* subtitle = playerWon
-        ? "Congratulations! You sank all enemy ships!"
+    const char* subtitle = playerWon ? "Congratulations! You sank all enemy ships!"
         : "The AI sank all your ships. Better luck next time!";
     const int subtitleWidth = MeasureText(subtitle, subtitleFontSize);
-    DrawText(subtitle,
-             (m_screenWidth - subtitleWidth) / 2,
-             static_cast<int>(m_screenHeight * 0.26f),
-             subtitleFontSize,
-             GameColors::TEXT_DIM);
+    DrawText(subtitle, (m_screenWidth - subtitleWidth) / 2, static_cast<int>(m_screenHeight * 0.26f),
+        subtitleFontSize, GameColors::TEXT_DIM);
 
-    // ── Stats Panels ──────────────────────────────────────────────────────
+    // ── Stats Panels ────────────────────
     const float playerHitRate = playerShots > 0
-        ? static_cast<float>(playerHits) / static_cast<float>(playerShots) * 100.0f
-        : 0.0f;
+        ? static_cast<float>(playerHits) / static_cast<float>(playerShots) * 100.0f : 0.0f;
 
     const float aiHitRate = aiShots > 0
-        ? static_cast<float>(aiHits) / static_cast<float>(aiShots) * 100.0f
-        : 0.0f;
+        ? static_cast<float>(aiHits) / static_cast<float>(aiShots) * 100.0f : 0.0f;
 
     constexpr int panelW = 280;
     constexpr int panelH = 160;
@@ -510,21 +437,15 @@ void Renderer::DrawGameOverScreen(const bool playerWon, const int playerHits,
     const int playerPanelX = m_screenWidth / 2 - panelW - 40;
     const int aiPanelX     = m_screenWidth / 2 + 40;
 
-    // Player panel background
+    // ── Player panel background ────────────────────
     DrawRectangle(playerPanelX, panelY, panelW, panelH, GameColors::PANEL);
-    DrawRectangleLinesEx({ static_cast<float>(playerPanelX),
-                           static_cast<float>(panelY),
-                           static_cast<float>(panelW),
-                           static_cast<float>(panelH) },
-                         2, GameColors::TEXT_SUCCESS);
+    DrawRectangleLinesEx({ static_cast<float>(playerPanelX), static_cast<float>(panelY), 
+        static_cast<float>(panelW), static_cast<float>(panelH) }, 2, GameColors::TEXT_SUCCESS);
 
-    // AI panel background
+    // ── AI panel background ────────────────────
     DrawRectangle(aiPanelX, panelY, panelW, panelH, GameColors::PANEL);
-    DrawRectangleLinesEx({ static_cast<float>(aiPanelX),
-                           static_cast<float>(panelY),
-                           static_cast<float>(panelW),
-                           static_cast<float>(panelH) },
-                         2, GameColors::TEXT_ERROR);
+    DrawRectangleLinesEx({ static_cast<float>(aiPanelX), static_cast<float>(panelY), 
+        static_cast<float>(panelW), static_cast<float>(panelH) }, 2, GameColors::TEXT_ERROR);
 
     constexpr int statsFontSize  = 20;
     constexpr int labelFontSize  = 16;
@@ -532,47 +453,35 @@ void Renderer::DrawGameOverScreen(const bool playerWon, const int playerHits,
     constexpr int paddingX       = 20;
     constexpr int paddingY       = 20;
 
-    // Player stats
-    DrawText("Player Stats:",
-             playerPanelX + paddingX, panelY + paddingY,
-             statsFontSize, GameColors::TEXT_SUCCESS);
-    DrawText(TextFormat("Hits:     %d", playerHits),
-             playerPanelX + paddingX, panelY + paddingY + lineHeight,
-             labelFontSize, GameColors::TEXT_NORMAL);
-    DrawText(TextFormat("Shots:    %d", playerShots),
-             playerPanelX + paddingX, panelY + paddingY + lineHeight * 2,
-             labelFontSize, GameColors::TEXT_NORMAL);
-    DrawText(TextFormat("Hitrate:  %.1f%%", playerHitRate),
-             playerPanelX + paddingX, panelY + paddingY + lineHeight * 3,
-             labelFontSize, GameColors::TEXT_WARNING);
+    // ── Player stats ────────────────────
+    DrawText("Player Stats:", playerPanelX + paddingX, panelY + paddingY, statsFontSize, GameColors::TEXT_SUCCESS);
+    DrawText(TextFormat("Hits:     %d", playerHits), playerPanelX + paddingX, panelY + paddingY + lineHeight,
+        labelFontSize, GameColors::TEXT_NORMAL);
+    DrawText(TextFormat("Shots:    %d", playerShots), playerPanelX + paddingX, panelY + paddingY + lineHeight * 2,
+        labelFontSize, GameColors::TEXT_NORMAL);
+    DrawText(TextFormat("Hitrate:  %.1f%%", playerHitRate), playerPanelX + paddingX, 
+        panelY + paddingY + lineHeight * 3, labelFontSize, GameColors::TEXT_WARNING);
 
-    // AI stats
-    DrawText("AI Stats:",
-             aiPanelX + paddingX, panelY + paddingY,
-             statsFontSize, GameColors::TEXT_ERROR);
-    DrawText(TextFormat("Hits:     %d", aiHits),
-             aiPanelX + paddingX, panelY + paddingY + lineHeight,
-             labelFontSize, GameColors::TEXT_NORMAL);
-    DrawText(TextFormat("Shots:    %d", aiShots),
-             aiPanelX + paddingX, panelY + paddingY + lineHeight * 2,
-             labelFontSize, GameColors::TEXT_NORMAL);
-    DrawText(TextFormat("Hitrate:  %.1f%%", aiHitRate),
-             aiPanelX + paddingX, panelY + paddingY + lineHeight * 3,
-             labelFontSize, GameColors::TEXT_WARNING);
+    // ── AI stats ────────────────────
+    DrawText("AI Stats:", aiPanelX + paddingX, panelY + paddingY, statsFontSize, GameColors::TEXT_ERROR);
+    DrawText(TextFormat("Hits:     %d", aiHits), aiPanelX + paddingX, panelY + paddingY + lineHeight,
+        labelFontSize, GameColors::TEXT_NORMAL);
+    DrawText(TextFormat("Shots:    %d", aiShots), aiPanelX + paddingX, panelY + paddingY + lineHeight * 2,
+        labelFontSize, GameColors::TEXT_NORMAL);
+    DrawText(TextFormat("Hitrate:  %.1f%%", aiHitRate), aiPanelX + paddingX, panelY + paddingY + lineHeight * 3,
+        labelFontSize, GameColors::TEXT_WARNING);
 
-    // ── Prompt ────────────────────────────────────────────────────────────
+    // ── Prompt ────────────────────
     const float enterPulse = (std::sin(timer * 3.0f) + 1.0f) / 2.0f;
     const unsigned char enterAlpha = static_cast<unsigned char>(150 + enterPulse * 105.0f);
 
     constexpr int promptFontSize = 20;
-    const char* prompt = "Press ENTER to play again          ESC to quit";
+    const auto prompt = "Press ENTER to play again          ESC to quit";
     const int promptWidth = MeasureText(prompt, promptFontSize);
-    DrawText(prompt,
-             (m_screenWidth - promptWidth) / 2,
-             static_cast<int>(m_screenHeight * 0.88f),
-             promptFontSize,
-             { GameColors::TEXT_DIM.r,
-               GameColors::TEXT_DIM.g,
-               GameColors::TEXT_DIM.b,
-               enterAlpha });
+    DrawText(prompt, (m_screenWidth - promptWidth) / 2, static_cast<int>(m_screenHeight * 0.88f),
+        promptFontSize,
+        { GameColors::TEXT_DIM.r,
+            GameColors::TEXT_DIM.g,
+            GameColors::TEXT_DIM.b,
+            enterAlpha });
 }

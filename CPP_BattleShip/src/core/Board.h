@@ -4,10 +4,11 @@
  +                                                                           +
  + Manages board data, ship positions and shot tracking.                     +
  + SRP: This class only knows its own data. Drawing is handled               +
- + by the Renderer, input validation by the InputValidator.                  +
+ + by the Renderer, shot validation by WasAlreadyShot().                     +
  *****************************************************************************/
 
 #pragma once
+
 #include <vector>
 #include "Ship.h"
 
@@ -21,30 +22,28 @@ public:
     // ── Methods ────────────────────
     void AddShip(const Ship& ship);
     Ship* FindShipAtCell(int row, int column);
-    [[nodiscard]] bool AllShipsSunk() const;
     void ResetShipCount() { m_shipsRemaining = 0; }
+    
+    [[nodiscard]] bool AllShipsSunk() const;
+    [[nodiscard]] bool WasAlreadyShot(int row, int col) const;
 
     // ── Getters ────────────────────
-    // Non-const references so Game can mutate values directly,
-    // e.g. GetRemainingShips()-- after a hit
     std::vector<std::vector<char>>& GetGameBoard()   { return m_gameBoard;   }
     std::vector<std::vector<char>>& GetHiddenBoard() { return m_hiddenBoard; }
+    
+    void IncrementShotsFired()    { m_shotsFired++;     }
+    void IncrementHits()          { m_hits++;           }
+    void DecrementRemainingShips(){ m_shipsRemaining--; }
 
     // Const overloads for read-only access (e.g. Renderer)
     [[nodiscard]] const std::vector<std::vector<char>>& GetGameBoard()   const { return m_gameBoard;   }
     [[nodiscard]] const std::vector<std::vector<char>>& GetHiddenBoard() const { return m_hiddenBoard; }
-
-    void IncrementShotsFired()    { m_shotsFired++;     }
-    void IncrementHits()          { m_hits++;           }
-    void DecrementRemainingShips(){ m_shipsRemaining--; }
     
     [[nodiscard]] int GetShotsFired()     const { return m_shotsFired;     }
     [[nodiscard]] int GetHits()           const { return m_hits;           }
     [[nodiscard]] int GetRemainingShips() const { return m_shipsRemaining; }
     
     [[nodiscard]] int  GetBoardSize()    const { return m_boardSize;           }
-    [[nodiscard]] bool GetWinCondition() const { return m_shipsRemaining <= 0; }
-    
     [[nodiscard]] std::vector<Ship>& GetShips() { return m_ships; }
     [[nodiscard]] const std::vector<Ship>& GetShips() const { return m_ships; }
 

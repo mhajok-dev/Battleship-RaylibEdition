@@ -1,5 +1,5 @@
 ﻿/*****************************************************************************
-+ Project: Battleship - Raylib Edition                                      +
+ + Project: Battleship - Raylib Edition                                      +
  + File: Types.h                                                             +
  +                                                                           +
  + Shared data types used across multiple modules.                           +

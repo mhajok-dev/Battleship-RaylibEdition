@@ -19,7 +19,6 @@ void AudioManager::LoadSounds()
     m_gameMusic = LoadMusicStream("assets/game_bgm.mp3");
     m_endMusic  = LoadMusicStream("assets/endscreen.mp3");
     
-    
     m_menuMusic.looping = true;
     m_gameMusic.looping = true;
     m_endMusic.looping  = true;

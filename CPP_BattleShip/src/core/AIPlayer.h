@@ -1,5 +1,5 @@
 ﻿/*****************************************************************************
-+ Project: Battleship - Raylib Edition                                      +
+ + Project: Battleship - Raylib Edition                                      +
  + File: AIPlayer.h                                                          +
  +                                                                           +
  + AI player with Hunt & Target algorithm.                                   +
@@ -18,22 +18,21 @@
 class AIPlayer : public Player
 {
 public:
-    // ── Constructor / Destructor ─────
+    // ── Constructor / Destructor ────────────────────
     explicit AIPlayer(int boardSize);
     ~AIPlayer() override = default;
 
-    // ── Methods ─────
-    std::string MakeMove() override;
+    // ── Methods ────────────────────
+    Coordinate MakeMove() override;
     void EnqueueAdjacentCells(const Coordinate& coord);
     void ClearTargetCells();
 
 private:
-    // ── Methods ─────
-    std::string CoordinateToString(const Coordinate& coord) const;
+    // ── Methods ────────────────────
     Coordinate GetHuntModeMove() const;
 
-    // ── Member Variables ─────
+    // ── Member Variables ────────────────────
     // Target mode: queue of cells to shoot at after a hit
     std::vector<Coordinate> m_targetCells = {};
-    mutable std::mt19937 m_rng = std::mt19937(std::random_device{}());
+    mutable std::mt19937 m_rng = std::mt19937(std::random_device{}()); //for hunt mode
 };

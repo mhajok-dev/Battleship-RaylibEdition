@@ -1,5 +1,5 @@
 ﻿/*****************************************************************************
-+ Project: Battleship - Raylib Edition                                      +
+ + Project: Battleship - Raylib Edition                                      +
  + File: Player.h                                                            +
  +                                                                           +
  + Abstract base class for all player types.                                 +
@@ -9,39 +9,40 @@
  *****************************************************************************/
 
 #pragma once
+
 #include <string>
 #include <vector>
 #include <memory>
 #include "Board.h"
+#include "Types.h"
 
 class Player
 {
 public:
-    // ── Constructor / Destructor ──────────────────────────────────────────
+    // ── Constructor / Destructor ────────────────────
     Player(std::string name, int boardSize);
     virtual ~Player() = default;
 
-    // ── Methods ───────────────────────────────────────────────────────────
+    // ── Methods ────────────────────
     // Pure virtual: every subclass must implement its own move logic.
     // This is the core of polymorphism — Game calls MakeMove() without
     // knowing whether it's talking to a human or an AI.
-    virtual std::string MakeMove() = 0;
-
+    virtual Coordinate MakeMove() = 0;
     void UpdateMoveHistory(int row, int column);
+    
     [[nodiscard]] bool IsValidMove(int row, int column) const;
 
-    // ── Getters ───────────────────────────────────────────────────────────
+    // ── Getters ────────────────────
     [[nodiscard]] const std::string& GetName() const { return m_name; }
     [[nodiscard]] Board* GetBoard() const { return m_pBoard.get(); }
 
 protected:
-    // ── Member Variables ──────────────────────────────────────────────────
+    // ── Member Variables ────────────────────
     std::string m_name;
     int m_boardSize = 0;
 
     // unique_ptr: Player owns the Board.
     // No manual delete needed, no memory leak possible.
     std::unique_ptr<Board> m_pBoard = nullptr;
-
     std::vector<std::vector<bool>> m_moveHistory = {};
 };
