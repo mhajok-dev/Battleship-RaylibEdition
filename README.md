@@ -7,16 +7,16 @@ A graphical Battleship game built in C++ using the raylib library. Play against 
 ## Screenshots
 
 ### Menu Screen
-![Menu Screen](screenshots/MenuScreen.png)
+![Menu Screen](Screenshots/MenuScreen.png)
 
 ### Game Screen
-![Game Screen](screenshots/GameScreen.png)
+![Game Screen](Screenshots/GameScreen.png)
 
 ### Sunk Ship
-![Sunk Ship](screenshots/SunkShip.png)
+![Sunk Ship](Screenshots/SunkShip.png)
 
 ### Game Over Screen
-![Game Over Screen](screenshots/GameOverScreen.png)
+![Game Over Screen](Screenshots/GameOverScreen.png)
 
 ---
 
