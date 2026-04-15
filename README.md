@@ -6,7 +6,7 @@ A graphical Battleship game built in C++ using the raylib library. Play against 
 
 ## Demo-Video
 
-![Demo](screenshots/BattleShip_Demo.gif)
+![Demo](Screenshots/BattleShip_Demo.gif)
 
 ---
 
