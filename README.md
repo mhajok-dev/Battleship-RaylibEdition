@@ -20,6 +20,20 @@ A graphical Battleship game built in C++ using the raylib library. Play against 
 
 ---
 
+## Download & Play
+
+Download the latest release from the [Releases](https://github.com/mhajok-dev/Battleship-RaylibEdition/releases) page.
+Extract the ZIP and run `CPP_BattleShip.exe` — no installation required.
+
+## Building from Source
+This project uses **Visual Studio 2022** (.sln).
+1. Clone the repo.
+2. Download **raylib 5.5** (Windows MSVC version).
+3. Place the `include` and `lib` folders into `Dependencies/raylib/`.
+4. Open `CPP_BattleShip.sln` and build for **x64 Release**.
+
+---
+
 ## Features
 
 - Configurable board size from 5×5 up to 15×15 — fleet scales automatically
